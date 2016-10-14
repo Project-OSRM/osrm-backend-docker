@@ -1,7 +1,14 @@
 # OSRM processing tools, server and profile
 
 FROM alpine:3.4
+
+# This can be a gitsha, tag, or branch - anything that works with `git checkout`
 ARG OSRM_VERSION
+
+# This is passed to cmake for osrm-backend.  All other dependencies are built in
+# release mode.
+ARG BUILD_TYPE=Release
+
 RUN mkdir /opt
 WORKDIR /opt
 RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
@@ -16,7 +23,7 @@ RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
     cd luabind && \
     mkdir build && \
     cd build && \
-    cmake .. && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
     make -j${NPROC} && \
     make install && \
     \
@@ -37,7 +44,7 @@ RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
     git checkout ${OSRM_VERSION} && \
     mkdir build && \
     cd build && \
-    cmake -DLUABIND_INCLUDE_DIR=/usr/local/include .. && \
+    cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUABIND_INCLUDE_DIR=/usr/local/include .. && \
     make -j${NPROC} install && \
     cd ../profiles && \
     cp -r * /opt && \

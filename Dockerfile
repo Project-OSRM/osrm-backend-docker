@@ -57,3 +57,5 @@ RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
     apk del g++ cmake libc-dev expat-dev zlib-dev bzip2-dev lua5.1-dev git make gcc && \
     apk add boost-filesystem boost-program_options boost-regex boost-iostreams boost-thread libgomp lua5.1 expat && \
     rm -rf /opt/osrm-backend /opt/stxxl /opt/luabind /usr/local/bin/stxxl_tool /usr/local/lib/libosrm*
+
+EXPOSE 5000

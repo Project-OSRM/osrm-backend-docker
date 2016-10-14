@@ -4,7 +4,8 @@ FROM alpine:3.4
 ARG OSRM_VERSION
 RUN mkdir /opt
 WORKDIR /opt
-RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
+    echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
     apk add git cmake wget make libc-dev gcc g++ bzip2-dev boost-dev zlib-dev expat-dev lua5.1-dev libtbb@testing libtbb-dev@testing && \
@@ -16,7 +17,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
     mkdir build && \
     cd build && \
     cmake .. && \
-    make && \
+    make -j${NPROC} && \
     make install && \
     \
     echo "Building libstxxl" && \
@@ -26,7 +27,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
     mkdir build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make && \
+    make -j${NPROC} && \
     make install && \
     \
     echo "Building OSRM ${OSRM_VERSION}" &&\
@@ -37,7 +38,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
     mkdir build && \
     cd build && \
     cmake -DLUABIND_INCLUDE_DIR=/usr/local/include .. && \
-    make install && \
+    make -j${NPROC} install && \
     cd ../profiles && \
     cp -r * /opt && \
     \
@@ -48,4 +49,4 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/ap
     apk del boost-dev && \
     apk del g++ cmake libc-dev expat-dev zlib-dev bzip2-dev lua5.1-dev git make gcc && \
     apk add boost-filesystem boost-program_options boost-regex boost-iostreams boost-thread libgomp lua5.1 expat && \
-    rm -rf /opt/osrm-backend /opt/stxxl /opt/luabind /usr/local/bin/stxxl_tool
+    rm -rf /opt/osrm-backend /opt/stxxl /opt/luabind /usr/local/bin/stxxl_tool /usr/local/lib/libosrm*

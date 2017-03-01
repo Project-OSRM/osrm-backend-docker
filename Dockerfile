@@ -34,7 +34,7 @@ RUN NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
     git checkout ${OSRM_VERSION} && \
     mkdir build && \
     cd build && \
-    cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} .. && \
+    cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_LTO=On .. && \
     make -j${NPROC} install && \
     cd ../profiles && \
     cp -r * /opt && \
